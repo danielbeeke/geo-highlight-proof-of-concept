@@ -1,0 +1,11 @@
+$icon-font-path: "/bower_components/sass-bootstrap/fonts/";
+
+@import 'sass-bootstrap/lib/bootstrap';
+
+html, body {
+  height: 100%;
+}
+
+#map {
+  height: 100%;
+}
