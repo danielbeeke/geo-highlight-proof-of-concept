@@ -9,3 +9,9 @@ html, body {
 #map {
   height: 100%;
 }
+
+.leaflet-control-geosearch {
+  position: absolute;
+  top: 70px;
+  left: 10px;
+}

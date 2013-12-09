@@ -1,15 +1,27 @@
 (function ($) {
   
-  var map = L.map('map').setView([51.505, -0.09], 6);
+  var map = L.map('map', {
+    // fadeAnimation: false
+  }).setView([51.505, -0.09], 6);
 
   var date = new Date();
   var milliseconds = date.getMilliseconds(); 
+  var globalCurrentMap = 'countries'
 
   var baseUrl = function (currentMap) {
     return 'http://{s}.tilemill.studiofonkel.nl/style/{z}/{x}/{y}.png?id=tmstyle:///home/administrator/' + currentMap + '.tm2&mtime=' + milliseconds;
   }
 
   var layer = L.tileLayer(baseUrl('countries')).addTo(map);
+
+  var utfGrid = new L.UtfGrid('http://{s}.tilemill.studiofonkel.nl/utfgrid-getter/{z}/{x}/{y}.grid.json?callback={cb}&id=tmstyle:///home/administrator/countries.tm2');
+
+  map.addLayer(utfGrid);
+
+  utfGrid.on('click', function (e) {
+    globalCurrentMap = e.data.iso_a2
+    layer.setUrl(baseUrl('generated/countries-' + globalCurrentMap))
+  });
 
   new L.Control.GeoSearch({
       provider: new L.GeoSearch.Provider.Google(),
@@ -18,37 +30,42 @@
   }).addTo(map);
 
   $('#map').on('google_geocode_response', function (event, data) {
-    layer.setUrl(baseUrl('generated/countries-' + data.address_components.pop().short_name))
+    globalCurrentMap = data.address_components.pop().short_name
+    layer.setUrl(baseUrl('generated/countries-' + globalCurrentMap))
   })
 
+  L.TileLayer.prototype.getTileUrl = function (tilePoint) {
+    if (utfGrid._cache[tilePoint.z + '_' + tilePoint.x + '_' + tilePoint.y]) {
+      var cache= utfGrid._cache[tilePoint.z + '_' + tilePoint.x + '_' + tilePoint.y]
+      var found = false
 
-  L.GeoSearch.Provider.Google.prototype.GetLocations = function(qry, callback) {
-    var geocoder = L.GeoSearch.Provider.Google.Geocoder;
+      if (cache.data) {
+        $.each(cache.data, function (index, item) {
+          if(item.iso_a2 == globalCurrentMap) {
+            found = true
+          }
+        })
 
-    var parameters = L.Util.extend({
-        address: qry
-    }, this.options);
+        if (!found) {
+          mapToUse = 'http://{s}.tilemill.studiofonkel.nl/style/{z}/{x}/{y}.png?id=tmstyle:///home/administrator/countries.tm2&mtime=' + milliseconds
 
-    var results = geocoder.geocode(parameters, function(data){
+          return L.Util.template(mapToUse, L.extend({
+            s: this._getSubdomain(tilePoint),
+            z: tilePoint.z,
+            x: tilePoint.x,
+            y: tilePoint.y
+          }, this.options));
+        }
+      }
+    }
 
-        $('#map').trigger('google_geocode_response', data)
-
-        data = {results: data};
-
-        if (data.results.length == 0)
-            return [];
-
-        var results = [];
-        for (var i = 0; i < data.results.length; i++)
-            results.push(new L.GeoSearch.Result(
-                data.results[i].geometry.location.lng(),
-                data.results[i].geometry.location.lat(),
-                data.results[i].formatted_address
-            ));
-
-        if(typeof callback == 'function')
-            callback(results);
-    });
+    return L.Util.template(this._url, L.extend({
+      s: this._getSubdomain(tilePoint),
+      z: tilePoint.z,
+      x: tilePoint.x,
+      y: tilePoint.y
+    }, this.options));
   }
 
 })(jQuery);
+
