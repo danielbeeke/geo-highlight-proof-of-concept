@@ -10,8 +10,8 @@
     return 'http://{s}.tilemill.studiofonkel.nl/style/{z}/{x}/{y}.png?id=tmstyle:///home/administrator/' + currentMap + '.tm2&mtime=' + n
   }
 
-  var layer = L.tileLayer(baseUrl('countries')).addTo(map)
-  var highlightLayer = L.tileLayer(baseUrl('countries')).addTo(map)
+  var layer = L.tileLayer('https://www.mapbox.com/v3/graphius.gfan7dd3/{z}/{x}/{y}.png').addTo(map)
+  var highlightLayer = L.tileLayer('https://www.mapbox.com/v3/graphius.gfan7dd3/{z}/{x}/{y}.png').addTo(map)
   var utfGrid = new L.UtfGrid('http://{s}.tilemill.studiofonkel.nl/utfgrid-getter/{z}/{x}/{y}.grid.json?callback={cb}&id=tmstyle:///home/administrator/countries.tm2')
 
   map.addLayer(utfGrid)
