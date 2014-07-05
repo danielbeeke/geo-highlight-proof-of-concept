@@ -5,7 +5,9 @@
     "sass-bootstrap": "~3.0.0",
     "modernizr": "~2.6.2",
     "jquery": "~1.10.2",
-    "mapbox.js": "mapbox/mapbox.js#~1.6.0"
+    "mapbox.js": "mapbox/mapbox.js#~1.6.0",
+    "leaflet": "~0.7.2",
+    "Leaflet.utfgrid": "https://github.com/danzel/Leaflet.utfgrid.git"
   },
   "devDependencies": {}
 }

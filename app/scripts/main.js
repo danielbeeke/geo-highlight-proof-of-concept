@@ -1,5 +1,5 @@
 (function ($) {
-  
+
   var map = L.mapbox.map('map', 'graphius.gfan7dd3')
     .setView([52, 5], 8);
 
